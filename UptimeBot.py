@@ -30,8 +30,8 @@ log_file = os.path.join(log_dir, "NOMELOG.log")
 logger = logging.getLogger("WebsiteMonitor")
 logger.info(f"Log level set to {level}")
 logger.setLevel(logging.INFO)  # Set log level on INFO
-#handler = TimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30)
-handler = TimedRotatingFileHandler(log_file, when="M", interval=1, backupCount=1000)
+handler = TimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30)
+#handler = TimedRotatingFileHandler(log_file, when="M", interval=1, backupCount=1000)
 handler.suffix = "%Y-%m-%d_%H-%M"
 formatter = logging.Formatter('%(asctime)s - %(message)s')
 handler.setFormatter(formatter)
@@ -73,7 +73,7 @@ def monitor():
                 print(log_message)
                 logger.info(log_message)
             except requests.exceptions.RequestException as e:
-                log_message = f"URL: {url}, Website is down or unreachable. Error: {e}"
+                log_message = f"{time.strftime('%Y-%m-%d %H:%M:%S')} | URL: {url}, Website is down or unreachable. Error: {e}"
                 print(log_message)
                 logger.info(log_message)
         
@@ -86,7 +86,7 @@ def monitor():
                     logger.info(f"Preparing to create SHA256 file for: {previous_log}")
                     make_file_immutable(previous_log)
         
-        time.sleep(30)
+        time.sleep(120)
 
 if __name__ == "__main__":
     monitor()
