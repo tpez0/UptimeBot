@@ -18,24 +18,35 @@ import subprocess
 import os
 import hashlib
 
-urls = [
-    "https://www.WEBSITE.com"
-]
+
+# Function to get URLs from user input
+def get_urls_from_input():
+    urls = []
+    print("Enter the URLs to monitor (type 'done' to finish):")
+    while True:
+        url = input("URL: ")
+        if url.lower() == 'done':
+            break
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
+        urls.append(url)
+    return urls
+
+
+# Function to get log file name from user input
+def get_log_file_name():
+    log_file_name = input("Enter the log file name (without extension): ")
+    return os.path.join(log_dir, f"{log_file_name}.log")
+
 timeout_seconds = 10
 log_dir = "./logs"
 os.makedirs(log_dir, exist_ok=True)
-log_file = os.path.join(log_dir, "NOMELOG.log")
+
 
 # Configure logger
-logger = logging.getLogger("WebsiteMonitor")
-logger.info(f"Log level set to {level}")
+logger = logging.getLogger("UptimeBot")
 logger.setLevel(logging.INFO)  # Set log level on INFO
-handler = TimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30)
-#handler = TimedRotatingFileHandler(log_file, when="M", interval=1, backupCount=1000)
-handler.suffix = "%Y-%m-%d_%H-%M"
-formatter = logging.Formatter('%(asctime)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+
 
 # FFunction to make the file read-only and generate SHA256
 def make_file_immutable(filepath):
@@ -63,7 +74,7 @@ def make_file_immutable(filepath):
         print(f"Failed to make file read-only: {abs_filepath}, Error: {e}")
 
 # Monitoring function
-def monitor():
+def monitor(urls):
     logger.info("Starting monitor function")
     while True:
         for url in urls:
@@ -86,7 +97,17 @@ def monitor():
                     logger.info(f"Preparing to create SHA256 file for: {previous_log}")
                     make_file_immutable(previous_log)
         
-        time.sleep(120)
+        time.sleep(30)
 
 if __name__ == "__main__":
-    monitor()
+    urls = get_urls_from_input()
+    log_file = get_log_file_name()
+
+    #handler = TimedRotatingFileHandler(log_file, when="midnight", interval=1, backupCount=30)
+    handler = TimedRotatingFileHandler(log_file, when="M", interval=1, backupCount=1000)
+    handler.suffix = "%Y-%m-%d_%H-%M"
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    monitor(urls)
