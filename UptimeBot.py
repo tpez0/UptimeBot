@@ -69,7 +69,7 @@ def monitor():
         for url in urls:
             try:
                 response = requests.get(url, timeout=timeout_seconds)
-                log_message = f"URL: {url}, Status Code: {response.status_code}, Response Time: {response.elapsed.total_seconds()} seconds"
+                log_message = f"{time.strftime('%Y-%m-%d %H:%M:%S')} | URL: {url}, Status Code: {response.status_code}, Response Time: {response.elapsed.total_seconds()} seconds"
                 print(log_message)
                 logger.info(log_message)
             except requests.exceptions.RequestException as e:
